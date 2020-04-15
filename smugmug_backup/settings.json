@@ -1,0 +1,10 @@
+{
+  "app_key": "",
+  "app_key_secret": "",
+  "access_key": "",
+  "access_key_secret": "",
+  "output_dir": "./store",
+  "user": "",
+  "album_limit": 3,
+  "image_limit": 10000
+}
