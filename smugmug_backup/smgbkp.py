@@ -19,7 +19,7 @@ AWAIT_SLEEP_PROCESS_ALBUM = .2
 AWAIT_SLEEP_DOWNLOAD_ALBUM = 2
 
 APPLY_ALBUM_LIMIT = True
-MAKE_DIRS = False
+MAKE_DIRS = True
 RESET_PROGRESS = False
 EXECUTE_DOWNLOADS = True
 UNZIP_ALBUMS = False
@@ -29,7 +29,7 @@ DEBUG = True
 
 async def load_settings() -> dict:
     try:
-        with open('./smgbkp/config.json', 'r') as config_json:
+        with open('./smugmug_backup/settings.json', 'r') as config_json:
             config = json.load(config_json)
 
             params = {
@@ -49,7 +49,7 @@ async def load_settings() -> dict:
             }
 
     except IOError:
-        print('Could not open config.json. Please ensure it exists')
+        print(f'Could not find settings.json file.')
         sys.exit(1)
 
 
@@ -61,6 +61,7 @@ class SmugMugSession:
         self.OAuth1Data = config['auth']
         self.PARAMS: dict = config['params']
 
+        # todo: check for absolute dir...
         self.STORE_BASE_DIR = './store'
         if config['config']['output_dir']:
             self.STORE_BASE_DIR = config['config']['output_dir']
@@ -213,7 +214,7 @@ class SmugMugSession:
     async def make_dirs(self,
                         album_list: Tuple[Dict] = None,
                         alt_dir: str = None):
-
+        # todo: if MAKE_DIRS is False, check if dirs exist before continuing...
         if not album_list:
             album_list = await self.get_album_list()
 
@@ -451,20 +452,6 @@ async def main():
 
         if UNZIP_ALBUMS:
             await smg_session.unzip_albums()
-
-        # await smg_session.make_dirs(alt_dir='albums_zip')
-        # zip_files = await smg_session.get_zip_file_list()
-        # from_to_map = dict()
-        # store_dir = pathlib.Path(smg_session.STORE_DIR).joinpath('albums_zip')
-        # for from_zip in zip_files:
-        #     from_zip_path = pathlib.Path(from_zip)
-        #     to_zip = pathlib.Path(*from_zip_path.parts[-2:])
-        #     to_zip = store_dir.joinpath(to_zip)
-        #     from_to_map[from_zip] = to_zip
-        #
-        # for o, d in from_to_map.items():
-        #     shutil.move(o, d.parent)
-        #     print(f'File {o} moved to {d}')
 
     finally:
         smg_session.save_json()
